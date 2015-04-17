@@ -29,6 +29,7 @@
   Boston, MA  02111-1307  USA
 */
 #include "Energia.h"
+#include "in430_complement.h"
 
 // the clock source is set so that watch dog timer (WDT) ticks every clock
 // cycle (F_CPU), and the watch dog timer ISR is called every 512 ticks
@@ -492,7 +493,7 @@ void sleepSeconds(uint32_t seconds)
 		/* Wait for WDT interrupt in LPM3
 		 * A user's ISR may abort this sleep using wakeup().
 		 */
-		__bis_status_register(LPM3_bits+GIE);
+		__bis_SR_register(LPM3_bits+GIE);
 	}
 
 	sleeping = false;
@@ -532,7 +533,7 @@ void sleep(uint32_t milliseconds)
 		/* Wait for WDT interrupt in LPM3.
 		 * A user's ISR may abort this sleep using wakeup().
 		 */
-		__bis_status_register(LPM3_bits+GIE);
+		__bis_SR_register(LPM3_bits+GIE);
 	}
 
 	sleeping = false;
@@ -554,7 +555,7 @@ void suspend(void)
 		/* Halt all clocks; millis and micros will quit advancing, only
 		 * a user ISR may wake it up using wakeup().
 		 */
-		__bis_status_register(LPM4_bits+GIE);
+		__bis_SR_register(LPM4_bits+GIE);
 	}
 
 	sleeping = false;
@@ -572,7 +573,7 @@ void delay(uint32_t milliseconds)
 			milliseconds--;
 			start += 1000;
 		}
-		__bis_status_register(LPM0_bits+GIE);
+		__bis_SR_register(LPM0_bits+GIE);
 	}
 }
 
@@ -596,5 +597,5 @@ void watchdog_isr (void)
 	wdt_overflow_count++;
 
         /* Exit from LMP3 on reti (this includes LMP0) */
-        __bic_status_register_on_exit(LPM3_bits);
+        __bic_SR_register_on_exit(LPM3_bits);
 }
